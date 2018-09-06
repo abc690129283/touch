@@ -1,0 +1,505 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0;"/>
+<title>正宗三江蜜柚</title>
+<meta name="format-detection" content="telephone=yes"/>
+<script type="text/javascript" src="js/Jquery/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="js/Phone/phone.js"></script>
+<script type="text/javascript" src="js/TouchSlide/TouchSlide.1.1.js"></script>
+<link href="css/style.css" type="text/css" rel="stylesheet" />
+</head>
+
+<body>
+<div class="whole">
+
+	<div class="header">
+    	<div class="left-icon"><img src="image/menu.png" /></div>
+        <div class="center-title">三红蜜柚</div>
+        <div class="right-search"></div>
+        <div class="search">
+        	<input type="text" name="search" value="" oninput="upperCase.call(this)" placeholder="请输入您要搜索的关键词" />
+            <i class="empty"><img src="image/close-1.png" /></i>
+            <button type="button" name="sear"><img src="image/search.png" /></button>
+            <span class="close"><img src="image/close-1.png" /></span>
+        </div>
+        <script type="text/javascript">
+        	$(function(){
+				$(window).scroll(function(){		
+					if($(window).scrollTop()>=2){
+						$('.header').removeClass('header-search');
+					}
+				});	
+			})
+        </script>
+    </div>
+
+    
+    <div class="source">
+        <div id="imgs">
+          <div class="bg"><img src="image/lunbo-1.png" width="100%" /></div>
+          <div class="bg"><img src="image/lunbo-2.png" width="100%" /></div>
+          <div class="bg"><img src="image/lunbo-3.png" width="100%" /></div>
+			<div class="bg"><img src="image/lunbo-4.png" width="100%" /></div>
+			<div class="bg"><img src="image/lunbo-5.png" width="100%" /></div>
+        </div>
+    </div>
+    
+    <script>
+		//封装的对象接受所有图片的盒元素与触发切换的最小滑动距离作为参数
+		var ImageSwiper = function(imgs, minRange) {
+		  this.imgBox = imgs
+		  this.imgs = imgs.children
+		  this.cur_img = 1  //起始图片设为1 ,而非0,将在图片显示方法中作-1处理
+		  this.ready_moved = true  //判断每次滑动开始的标记变量
+		  this.imgs_count = this.imgs.length
+		  this.touchX  //触控开始的手指最初落点
+		  this.minRange = Number(minRange)
+		  this.fadeIn  //图片切换的方式,这里使用淡入淡出
+		  this.fadeOut
+		  this.bindTouchEvn() //初始化绑定滑动事件
+		  //this.showPic(this.cur_img) //显示图片方法,注意其中图片编号的-1处理
+		}
+		ImageSwiper.prototype.bindTouchEvn = function() {
+		  this.imgBox.addEventListener('touchstart', this.touchstart.bind(this), false)
+		  this.imgBox.addEventListener('touchmove', this.touchmove.bind(this), false)
+		  this.imgBox.addEventListener('touchend', this.touchend.bind(this), false)
+		  this.imgBox.addEventListener('click', this.touchend.bind(this), false)	
+		}
+		ImageSwiper.prototype.touchstart = function(e) {
+		  if (this.ready_moved) {
+			var touch = e.touches[0];
+			this.touchX = touch.pageX;
+			this.ready_moved = false;
+		  }
+		
+		}
+		
+		ImageSwiper.prototype.touchmove = function(e) {
+		  e.preventDefault();
+		  var minRange = this.minRange
+		  var touchX = this.touchX
+		  var imgs_count = this.imgs_count
+		  //console.log(this.imgs[0]);
+		  if (!this.ready_moved) {
+		
+			var release = e.changedTouches[0];
+			var releasedAt = release.pageX;
+			if (releasedAt + minRange < touchX) {
+			  this.ready_moved = true;
+			  if (this.cur_img > (imgs_count - 1)) {
+				this.cur_img = 0;
+			  }
+			  this.cur_img++;
+			  //this.showPic(this.cur_img);
+		
+			} else if (releasedAt - minRange > touchX) {
+			  if (this.cur_img <= 1) {
+				this.cur_img = imgs_count + 1
+			  }
+			  this.cur_img--;
+			  //this.showPic(this.cur_img);
+			  this.ready_moved = true;
+			}
+		  }
+		
+		}
+		
+		ImageSwiper.prototype.touchend = function(e) {
+		  e.preventDefault();
+		  img_append();
+		  var minRange = this.minRange
+		  var touchX = this.touchX
+		  var imgs_count = this.imgs_count
+		  if (!this.ready_moved) {
+			var release = e.changedTouches[0];
+			var releasedAt = release.pageX;
+			if (releasedAt + minRange < touchX) {
+			  this.ready_moved = true;
+			  if (this.cur_img > (imgs_count - 1)) {
+				this.cur_img = 0;
+			  }
+			  this.cur_img++;
+			  showPic(this.cur_img);
+		
+			} else if (releasedAt - minRange > touchX) {
+			  if (this.cur_img <= 1) {
+				this.cur_img = imgs_count + 1
+			  }
+			  this.cur_img--;
+			  showPic(this.cur_img);
+			  this.ready_moved = true;
+			}
+		  }
+		
+		}
+		//在样式表中设置好 .fadeIn 的透明度为0
+		ImageSwiper.prototype.fadeIn = function(e) {
+		  //e.classList.add("fadeIn");
+		  //e.classList.add("act");
+		}
+		
+		ImageSwiper.prototype.fadeOut = function(e) {
+		  Array.prototype.forEach.call(e, function(e) {
+			e.className = "bg";
+		  })
+		}
+		
+		//轮播点功能
+		//ImageSwiper.prototype.showPic = function(cur_img) {
+		  //this.hidePics(this.imgs)
+		//得到图片元素的真实索引
+		 // var index = cur_img - 1
+		
+		 // if (document.getElementsByClassName("active")[0]) {
+			//var active = document.getElementsByClassName("active")[0];
+			//active.classList.remove("active")
+		 // }
+		 // document.getElementById("dot_" + index).classList.add("active");
+		
+		 // this.fadeIn(this.imgs[index]);
+		
+		//}
+		ImageSwiper.prototype.hidePics = function(e) {
+		  this.fadeOut(e)
+		
+		}
+		//传参
+		var imgs = new ImageSwiper(document.getElementById('imgs'), 30)
+		
+		//自动轮播		
+		function play(){
+            timer=setInterval(function(e){
+				$("#imgs").click();
+            },4000);
+        }
+		
+		play();
+		
+		function img_append(){
+			var firstCard = $('#imgs').children('.bg').first();
+			firstCard.addClass('fadeIn');
+			$('#imgs').append(firstCard);
+			img_change();	
+		}
+		
+		function img_change(){
+			$(".bg").each(function(index, element) {
+				$(this).css({"z-index":-index,"margin-top":-(index*10)+'px',"width":(730-index*20)+'px',"margin-left":(index*10)+'px'});
+			});
+		}
+		img_change();
+		
+	</script>
+    
+    <!--头部轮播END-->
+    
+    <!--食物分类-->
+    <div class="food-list">
+    	<div class="lists">
+        	<ul class="list">
+            	<a href="#">
+                    <li>
+                        <span class="color-1"><img src="image/icon-1.png" /></span>
+                        <p>大自然的味道</p>
+                    </li>
+                </a>
+                <a href="#">
+                    <li>
+                        <span class="color-2"><img src="image/icon-2.png" /></span>
+                        <p>厨房的诀窍</p>
+                    </li>
+                </a>
+                <a href="#">
+                    <li>
+                        <span class="color-3"><img src="image/icon-3.png" /></span>
+                        <p>时间的痕迹</p>
+                    </li>
+                </a>
+                <a href="#">
+                    <li>
+                        <span class="color-4"><img src="image/icon-4.png" /></span>
+                        <p>主食的途径</p>
+                    </li>
+                </a>
+                <a href="#">
+                    <li>
+                        <span class="color-5"><img src="image/icon-5.png" /></span>
+                        <p>香味的调和</p>
+                    </li>
+                </a>
+                <a href="#">
+                    <li>
+                        <span class="color-6"><img src="image/icon-6.png" /></span>
+                        <p>最美的推荐</p>
+                    </li>
+                </a>
+            </ul>
+            <script>
+            	$(function(){
+					$(".list").addClass("active");
+					$(".list li").each(function (i) {
+						$(this).attr("style", "-webkit-transition-delay:" + i * 0.2 + "s;"
+								+ "-moz-transition-delay:" + i * 0.2 + "s;"
+								+ "-o-transition-delay:" + i * 0.2 + "s;"
+								+ "transition-delay:" + i * 0.2 + "s;");
+					});	
+				})
+            </script>
+        </div>
+        
+        <!---抢购模块--->
+        <div class="snap">
+            <div id="countdown" class="countdown">
+            	<img src="image/cake.png" />
+                <div class="colockbox times" id="demo01">
+                    <!--<span class="dash day">-</span>-->
+                    <span class="dash hour">-</span>
+                    <span class="dash symbol">:</span>
+                    <span class="dash minute">-</span>
+                    <span class="dash symbol">:</span>
+                    <span class="dash second">-</span>
+                </div>
+			</div>
+            <script type="text/javascript">
+				$(function(){
+					countDown("2017/5/1 23:59:59","#demo01 .day","#demo01 .hour","#demo01 .minute","#demo01 .second");
+				});
+				
+				function countDown(time,day_elem,hour_elem,minute_elem,second_elem){
+					//if(typeof end_time == "string")
+					var end_time = new Date(time).getTime(),//月份是实际月份-1
+					//current_time = new Date().getTime(),
+					sys_second = (end_time-new Date().getTime())/1000;
+					var timer = setInterval(function(){
+						if (sys_second > 0) {
+							sys_second -= 1;
+							//var day = Math.floor((sys_second / 3600) / 24);
+							var hour = Math.floor((sys_second / 3600));
+							var minute = Math.floor((sys_second / 60) % 60);
+							var second = Math.floor(sys_second % 60);
+							//day_elem && $(day_elem).text(day);//计算天
+							$(hour_elem).text(hour<10?"0"+hour:hour);//计算小时
+							$(minute_elem).text(minute<10?"0"+minute:minute);//计算分
+							$(second_elem).text(second<10?"0"+second:second);// 计算秒
+						} else { 
+							clearInterval(timer);
+						}
+					}, 1000);
+				}
+			</script>
+
+            <div class="presell">
+            	<a class="presell-list" href="#">
+                	<img src="image/food-1.png" />
+                </a>
+                <a class="presell-list" href="#">
+                	<img src="image/food-2.png" />
+                </a>
+            </div>
+        </div>
+        <!---抢购模块END--->
+
+        <!----内容块--->
+        <div class="recommend">
+        	<a class="titles" href="#">
+            	<span><img src="image/heart.png" /></span>
+                <span>今日推荐</span>
+                <span><img src="image/title-tips.png" /></span>
+                <span class="enter"><img src="image/enter.png" /></span>
+            </a>
+        </div>
+        
+        <div class="content">
+        	<div class="con-img">
+            	<img src="image/im-1.jpg" />
+            </div>
+            
+            <div id="tabBox1" class="tabBox">
+                <div class="hd">
+                    <ul>
+                        <li>精选水果</li>
+                        <li>优品推荐</li>
+                        <li>精选</li>
+                    </ul>
+                </div>
+                <div class="bd" id="tabBox1-bd">
+                    <div class="con"><!-- 高度自适应需添加外层 -->
+                        <ul>
+                            <li>
+                            	<div class="tab-c">
+                                	<div class="tab-img">
+                                    	<img src="image/list-1.jpg" />
+                                    </div>
+                                    <div class="price">
+                                    	<span>￥<a>78.00</a></span>
+                                        <span>5.86元/500g</span>
+                                    </div>
+                                    <div class="tab-title">嫁接红心蜜柚苗柚子树苗三江蜜柚</div>
+                                </div>
+                            </li>
+                            <li>
+                            	<div class="tab-c">
+                                	<div class="tab-img">
+                                    	<img src="image/list-1.jpg" />
+                                    </div>
+                                    <div class="price">
+                                    	<span>￥<a>78.00</a></span>
+                                        <span>5.86元/500g</span>
+                                    </div>
+                                    <div class="tab-title">嫁接红心蜜柚苗柚子树苗三江蜜柚</div>
+                                </div>
+                            </li>
+                            <li>
+                            	<div class="tab-c">
+                                	<div class="tab-img">
+                                    	<img src="image/list-2.jpg" />
+                                    </div>
+                                    <div class="price">
+                                    	<span>￥<a>78.00</a></span>
+                                        <span>5.86元/500g</span>
+                                    </div>
+                                    <div class="tab-title">嫁接红心蜜柚苗柚子树苗三江蜜柚</div>
+                                </div>
+                            </li>
+                            <li>
+                            	<div class="tab-c">
+                                	<div class="tab-img">
+                                    	<img src="image/list-2.jpg" />
+                                    </div>
+                                    <div class="price">
+                                    	<span>￥<a>78.00</a></span>
+                                        <span>5.86元/500g</span>
+                                    </div>
+                                    <div class="tab-title">嫁接红心蜜柚苗柚子树苗三江蜜柚</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="con"><!-- 高度自适应需添加外层 -->
+                        <ul>
+                            <li>
+                            	<div class="tab-c">
+                                	<div class="tab-img">
+                                    	<img src="image/list-3.jpg" />
+                                    </div>
+                                    <div class="price">
+                                    	<span>￥<a>78.00</a></span>
+                                        <span>5.86元/500g</span>
+                                    </div>
+                                    <div class="tab-title">嫁接红心蜜柚苗柚子树苗三江蜜柚</div>
+                                </div>
+                            </li>
+                            <li>
+                            	<div class="tab-c">
+                                	<div class="tab-img">
+                                    	<img src="image/list-3.jpg" />
+                                    </div>
+                                    <div class="price">
+                                    	<span>￥<a>78.00</a></span>
+                                        <span>5.86元/500g</span>
+                                    </div>
+                                    <div class="tab-title">嫁接红心蜜柚苗柚子树苗三江蜜柚</div>
+                                </div>
+                            </li>
+							<li>
+								<div class="tab-c">
+									<div class="tab-img">
+										<img src="image/list-3.jpg" />
+									</div>
+									<div class="price">
+										<span>￥<a>78.00</a></span>
+										<span>5.86元/500g</span>
+									</div>
+									<div class="tab-title">嫁接红心蜜柚苗柚子树苗三江蜜柚</div>
+								</div>
+							</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="con"><!-- 高度自适应需添加外层 -->
+                        <ul>
+                            <li>
+                            	<div class="tab-c">
+                                	<div class="tab-img">
+                                    	<img src="image/list-4.jpg" />
+                                    </div>
+                                    <div class="price">
+                                    	<span>￥<a>78.00</a></span>
+                                        <span>5.86元/500g</span>
+                                    </div>
+                                    <div class="tab-title">嫁接红心蜜柚苗柚子树苗三江蜜柚</div>
+                                </div>
+                            </li>
+                            <li>
+                            	<div class="tab-c">
+                                	<div class="tab-img">
+                                    	<img src="image/list-4.jpg" />
+                                    </div>
+                                    <div class="price">
+                                    	<span>￥<a>78.00</a></span>
+                                        <span>5.86元/500g</span>
+                                    </div>
+                                    <div class="tab-title">嫁接红心蜜柚苗柚子树苗三江蜜柚</div>
+                                </div>
+                            </li>
+                            <li>
+                            	<div class="tab-c">
+                                	<div class="tab-img">
+                                    	<img src="image/list-5.jpg" />
+                                    </div>
+                                    <div class="price">
+                                    	<span>￥<a>78.00</a></span>
+                                        <span>5.86元/500g</span>
+                                    </div>
+                                    <div class="tab-title">嫁接红心蜜柚苗柚子树苗三江蜜柚</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                </div>
+            </div>
+            
+            <script type="text/javascript">
+					TouchSlide( { slideCell:"#tabBox1",
+			
+						endFun:function(i){ //高度自适应
+							var bd = document.getElementById("tabBox1-bd");
+							bd.parentNode.style.height = bd.children[i].children[0].offsetHeight+"px";
+							if(i>0)bd.parentNode.style.transition="200ms";//添加动画效果
+						}
+			
+					} );
+			</script>
+        </div>
+    </div>
+	<div class="touch">
+		<span class="touch_dial"><a href="tel:18613044400">点我订购</a></span>
+		<img src="image/number.png" >
+		<span class="number">18613044400</span>
+	</div>
+</div>
+
+<script>
+$(function(){
+	//点击empty按钮
+	$('.empty').on('click',function(){
+		$("input[name='search']").val('');
+		$(this).hide();
+	});
+	
+})
+function upperCase(){
+	var val = $(this).val();
+	if(val>0){
+		$('.empty').show();
+	}else{
+		$('.empty').hide();
+	}
+}
+</script>
+</body>
+</html>
